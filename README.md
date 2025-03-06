@@ -5,7 +5,7 @@ Techstack:
         Backend - Axios (for sending and fetching api requests), CORS (Cross origin resource sharing), Express (backend) 
 
 How to run:
-1. git clone https://github.com/NKomrade/moodify.git
+1. git clone https://github.com/Divyansh-13/ModyTube.git
 2. cd frontend          {in 1 terminal}      
 3. npm install
 4. npm run dev
