@@ -51,7 +51,7 @@ The frontend will start (typically at [http://localhost:5173](http://localhost:5
 ```bash
 cd backend
 npm install
-node index.js      # or node app.js depending on your main backend file
+node server.js      # or node app.js depending on your main backend file
 ```
 The backend will start (typically at [http://localhost:5000](http://localhost:5000)).
 
