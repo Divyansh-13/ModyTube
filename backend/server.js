@@ -1,101 +1,54 @@
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+require("dotenv").config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Mood extraction logic
-const extractMood = (sentence) => {
-  const moodKeywords = {
-    happy: [
-      'happy', 'joy', 'excited', 'cheerful', 'elated', 'glad', 'content', 
-      'delighted', 'ecstatic', 'euphoric', 'blissful', 'jubilant', 'overjoyed', 
-      'radiant', 'thrilled', 'upbeat', 'exhilarated', 'buoyant'
-    ],
-    sad: [
-      'sad', 'alas', 'depressed', 'unhappy', 'melancholy', 'miserable', 'gloomy', 
-      'downcast', 'despondent', 'dismal', 'blue', 'forlorn', 'heartbroken', 
-      'grief-stricken', 'woeful', 'sorrowful', 'morose', 'dejected'
-    ],
-    energetic: [
-      'energetic', 'enthusiastic', 'pumped', 'active', 'lively', 'vibrant', 'dynamic', 
-      'exuberant', 'high-spirited', 'vigorous', 'animated', 'zesty', 'peppy', 
-      'bubbly', 'electrified', 'spirited', 'robust', 'hyper'
-    ],
-    calm: [
-      'calm', 'relaxed', 'peaceful', 'serene', 'tranquil', 'composed', 'soothing', 
-      'placid', 'quiet', 'mellow', 'untroubled', 'undisturbed', 'harmonious', 
-      'laid-back', 'equanimous', 'collected', 'contented', 'restful'
-    ]
-  };
-
-  const lowerCaseSentence = sentence.toLowerCase();
-  for (const [mood, keywords] of Object.entries(moodKeywords)) {
-    if (keywords.some((keyword) => lowerCaseSentence.includes(keyword))) {
-      return mood;
-    }
-  }
-
-  return 'calm'; // Default mood
-};
-
-// Mood to YouTube search query mapping
-const moodQueries = {
-  happy: 'happy bollywood and hollywood music',
-  sad: 'sad bollywood and hollywood music',
-  energetic: 'energetic bollywood and hollywood music',
-  calm: 'calm bollywood and hollywood music',
-};
-
-// Endpoint to get YouTube songs based on mood
-app.post('/api/songs', async (req, res) => {
+// API route to get song recommendations
+app.post("/api/songs", async (req, res) => {
   const { sentence } = req.body;
 
   if (!sentence) {
-    return res.status(400).json({ error: 'Please enter a sentence' });
+    return res.status(400).json({ error: "Sentence is required" });
   }
 
-  // Extract mood from the sentence
-  const mood = extractMood(sentence);
-  const query = moodQueries[mood];
+  // A simple query created from the user's input
+  const query = `${sentence} music`;
 
   try {
     // Search YouTube for songs related to the mood
     const response = await axios.get(
-      'https://www.googleapis.com/youtube/v3/search',
+      "https://www.googleapis.com/youtube/v3/search",
       {
         params: {
-          part: 'snippet',
+          part: "snippet",
           q: query,
-          type: 'video',
-          maxResults: 20, // Fetch 5 songs
-          key: process.env.YOUTUBE_API_KEY,
+          type: "video",
+          maxResults: 20,
+          key: process.env.YOUTUBE_API_KEY, // This reads the key from Vercel's settings
         },
       }
     );
 
-    // Extract video details
+    // Format the response to be cleaner for the frontend
     const videos = response.data.items.map((item) => ({
       title: item.snippet.title,
-      videoId: item.id.videoId,
+      thumbnail: item.snippet.thumbnails.high.url,
       url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-      thumbnail: item.snippet.thumbnails.default.url, // Thumbnail URL
     }));
 
-    // Send videos to the frontend
     res.json({ videos });
   } catch (error) {
-    console.error("YouTube API Error:", error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Failed to fetch songs' });
+    console.error("Error fetching from YouTube API:", error.response ? error.response.data : error.message);
+    res.status(500).json({ error: "Failed to fetch songs from YouTube. Check if the API key is valid and has access." });
   }
 });
 
-app.get('/api/health', (req, res) => {
-  res.send('Backend is running!');
-
+// Vercel handles starting the server, so we only need to export the app.
 module.exports = app;
-});
+
