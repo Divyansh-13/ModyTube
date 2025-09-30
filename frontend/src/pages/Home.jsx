@@ -21,7 +21,8 @@ const Home = () => {
     setRecommendations([]);
 
     try {
-      const response = await fetch('http://localhost:5000/api/songs', {
+      // Use a relative path for the API call. Vercel will route this correctly.
+      const response = await fetch('/api/songs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +40,8 @@ const Home = () => {
       setShowDropdown(true);
     } catch (error) {
       console.error("Error:", error.message);
-      alert(error.message);
+      // Avoid using alert() in production apps if possible. 
+      // Consider a more integrated UI notification.
     } finally {
       setLoading(false);
     }
@@ -86,15 +88,15 @@ const Home = () => {
                 onChange={handleInputChange}
                 placeholder="How are you feeling?"
                 className="w-full px-6 py-4 bg-black/20 rounded-full 
-                          text-white placeholder-gray-400 text-lg
-                          focus:outline-none focus:ring-2 focus:ring-white/30
-                          transition-all duration-300"
+                           text-white placeholder-gray-400 text-lg
+                           focus:outline-none focus:ring-2 focus:ring-white/30
+                           transition-all duration-300"
               />
               <button 
                 type="submit" 
                 className="absolute right-3 top-1/2 -translate-y-1/2 
-                          p-2 bg-white/10 hover:bg-white/20 rounded-full
-                          transition-all duration-300 disabled:opacity-50"
+                           p-2 bg-white/10 hover:bg-white/20 rounded-full
+                           transition-all duration-300 disabled:opacity-50"
                 disabled={loading || !sentence.trim()}
               >
                 <Search className="w-6 h-6 text-white" />
@@ -117,7 +119,7 @@ const Home = () => {
                   Recommended Songs
                 </h2>
                 <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-2 
-                              scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                                scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                   {recommendations.map((video, index) => (
                     <a
                       key={index}
@@ -125,24 +127,24 @@ const Home = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 p-3 rounded-lg 
-                                bg-black/20 hover:bg-black/30 
-                                transition-all duration-300 group"
+                                 bg-black/20 hover:bg-black/30 
+                                 transition-all duration-300 group"
                     >
                       <div className="relative overflow-hidden rounded-lg min-w-[80px] md:min-w-[120px]">
                         <img
                           src={video.thumbnail}
                           alt={video.title}
                           className="w-full aspect-video object-cover 
-                                   group-hover:scale-105 transition-transform duration-300"
+                                     group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm md:text-base 
-                                    line-clamp-2 break-words">
+                                      line-clamp-2 break-words">
                           {video.title}
                         </p>
                         <p className="text-gray-400 text-xs md:text-sm mt-1 
-                                    flex items-center gap-1">
+                                      flex items-center gap-1">
                           <Music2 className="w-3 h-3" /> 
                           Watch on YouTube
                         </p>
